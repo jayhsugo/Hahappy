@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "270929437635",
+    "firebase_url": "https://hahappy-f9fce.firebaseio.com",
+    "project_id": "hahappy-f9fce",
+    "storage_bucket": "hahappy-f9fce.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:270929437635:android:47c87474cc7c2fd2",
+        "android_client_info": {
+          "package_name": "com.gimmatek.hahappy"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "270929437635-62323jfd0p3soner9rf4plj26uvvgdeu.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.gimmatek.hahappy",
+            "certificate_hash": "e8ef3fea2dbf0e8693ffd46ee285b2990c29a837"
+          }
+        },
+        {
+          "client_id": "270929437635-6hqid4sqehto9bsedb0ba1e7jfg3kdv0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBRCYwgpEq2rFThr_Nxd2JfzQq4g_3OM7Q"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "270929437635-6hqid4sqehto9bsedb0ba1e7jfg3kdv0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
