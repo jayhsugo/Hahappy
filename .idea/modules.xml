@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/Hahappy.iml" filepath="$PROJECT_DIR$/Hahappy.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/Hahappy.iml" filepath="$PROJECT_DIR$/.idea/Hahappy.iml" />
+      <module fileurl="file://C:\Users\Jay\StudioProjects\Hahappy\Hahappy.iml" filepath="C:\Users\Jay\StudioProjects\Hahappy\Hahappy.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>

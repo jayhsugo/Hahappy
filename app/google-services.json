@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "270929437635-qgti98hl2rclk6rb4cch2g31344jbl1n.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.gimmatek.hahappy",
+            "certificate_hash": "47c97d4ef2243f2768f4f7991000d6a72ec97cd8"
+          }
+        },
+        {
           "client_id": "270929437635-62323jfd0p3soner9rf4plj26uvvgdeu.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

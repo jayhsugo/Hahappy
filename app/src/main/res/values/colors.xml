@@ -1,6 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF4081</color>
+    <color name="husky_blue">#01a1dd</color>
+    <color name="husky_blue_dark">#0097cf</color>
+    <color name="tab_default">#9b9b9b</color>
+    <color name="background_material">#fafafa</color>
+    <color name="backgroundDark">#2c364a</color>
+    <color name="image_circle_border">#e1e1e1</color>
+    <color name="colorPrimary">#ffffff</color>
+    <color name="colorPrimaryDark">#555555</color>
+    <color name="colorAccent">@color/husky_blue</color>
+    <color name="colorGrey">#9b9b9b</color>
+    <color name="colorCoin">#f6a623</color>
+    <color name="colorDonate">#f9943c</color>
+    <color name="colorTeamY">#f8e81c</color>
+    <color name="colorTeamG">#77de05</color>
+    <color name="colorTeamB">@color/colorAccent</color>
+    <color name="colorNotification">#0ae0ea</color>
+    <color name="colorBankText">#181e29</color>
+    <color name="colorBankNext">#d6d6d6</color>
+    <color name="colorBankBackground">#023d63</color>
+    <color name="aha_ic_launcher_background">#FFFFFF</color>
+    <color name="calendar_weekday_text">#8b8b8e</color>
+    <color name="calendar_day_text">#8b8b8e</color>
+    <color name="calendar_background">#f7f7f8</color>
+    <color name="discover_shop">#f5a623</color>
+    <color name="discover_lottery">#00d5e9</color>
 </resources>

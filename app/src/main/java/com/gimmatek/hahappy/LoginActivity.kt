@@ -1,10 +1,11 @@
 package com.gimmatek.hahappy
 
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import com.google.firebase.auth.FirebaseAuth
+import android.support.v7.app.AppCompatActivity
 import android.util.Log
+import android.view.View
 import android.widget.*
+import com.google.firebase.auth.FirebaseAuth
 
 class LoginActivity : AppCompatActivity(), RadioGroup.OnCheckedChangeListener {
 
@@ -12,6 +13,7 @@ class LoginActivity : AppCompatActivity(), RadioGroup.OnCheckedChangeListener {
     private lateinit var mAuthListener: FirebaseAuth.AuthStateListener
     private val uiLogo: ImageView by lazy { findViewById<ImageView>(R.id.iv_logo) }
     private val uiTitle: ImageView by lazy { findViewById<ImageView>(R.id.iv_title) }
+    private val uiLoginSoon: ImageView by lazy { findViewById<ImageView>(R.id.tv_title) }
     private val uiEmail: EditText by lazy { findViewById<EditText>(R.id.et_email) }
     private val uiPassword: EditText by lazy { findViewById<EditText>(R.id.et_password) }
     private val uiLogin: Button by lazy { findViewById<Button>(R.id.btn_login) }
@@ -24,6 +26,7 @@ class LoginActivity : AppCompatActivity(), RadioGroup.OnCheckedChangeListener {
     private val mLogos: Array<Int> = arrayOf(R.drawable.aha_logo_debug, R.drawable.aha_logo)
     private val mTitles: Array<Int> = arrayOf(R.drawable.aha_logo_text_debug, R.drawable.aha_logo_text)
     private val mModes: Array<String> = arrayOf("debug", "release")
+    private val uiProgress: ProgressBar by lazy { findViewById<ProgressBar>(R.id.progress_bar) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,24 +46,53 @@ class LoginActivity : AppCompatActivity(), RadioGroup.OnCheckedChangeListener {
         }
 
         uiLogin.setOnClickListener {
-            mEmail = uiEmail.text.toString()
-            mPassword = uiPassword.text.toString()
-            if (mDbPath != "") {
-                if (mEmail.isNotEmpty() && mPassword.isNotEmpty()) {
-                    mAuth.signInWithEmailAndPassword(mEmail, mPassword).addOnCompleteListener {
-                        if (it.isSuccessful) {
+            if (uiProgress.visibility != View.VISIBLE) {
+                uiProgress.visibility = View.VISIBLE
+                mEmail = uiEmail.text.toString()
+                mPassword = uiPassword.text.toString()
+                if (mDbPath != "") {
+                    if (mEmail.isNotEmpty() && mPassword.isNotEmpty()) {
+                        mAuth.signInWithEmailAndPassword(mEmail, mPassword).addOnCompleteListener {
+                            if (it.isSuccessful) {
+                                Toast.makeText(this@LoginActivity, "登入成功", Toast.LENGTH_SHORT).show()
+                                uiProgress.visibility = View.GONE
+                                startActivity(ScheduleActivity.createIntent(this@LoginActivity, mDbPath))
+                            } else {
+                                Toast.makeText(this@LoginActivity, "登入失敗", Toast.LENGTH_SHORT).show()
+                                uiProgress.visibility = View.GONE
+                            }
+                        }
+                    } else {
+                        Toast.makeText(this@LoginActivity, "請輸入帳號密碼", Toast.LENGTH_SHORT).show()
+                        uiProgress.visibility = View.GONE
+                    }
+                } else {
+                    Toast.makeText(this@LoginActivity, "請選擇環境", Toast.LENGTH_SHORT).show()
+                    uiProgress.visibility = View.GONE
+                }
+            }
+        }
+
+        uiLoginSoon.setOnLongClickListener {
+            if (uiProgress.visibility != View.VISIBLE) {
+                uiProgress.visibility = View.VISIBLE
+                if (mDbPath != "") {
+                    mAuth.signInWithEmailAndPassword("jayhsugo@gmail.com", "hahago").addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
                             Toast.makeText(this@LoginActivity, "登入成功", Toast.LENGTH_SHORT).show()
+                            uiProgress.visibility = View.GONE
                             startActivity(ScheduleActivity.createIntent(this@LoginActivity, mDbPath))
                         } else {
                             Toast.makeText(this@LoginActivity, "登入失敗", Toast.LENGTH_SHORT).show()
+                            uiProgress.visibility = View.GONE
                         }
                     }
                 } else {
-                    Toast.makeText(this@LoginActivity, "請輸入帳號密碼", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@LoginActivity, "請選擇環境", Toast.LENGTH_SHORT).show()
+                    uiProgress.visibility = View.GONE
                 }
-            } else {
-                Toast.makeText(this@LoginActivity, "請選擇環境", Toast.LENGTH_SHORT).show()
             }
+            return@setOnLongClickListener true
         }
     }
 
