@@ -2,14 +2,14 @@ package com.gimmatek.hahappy
 
 import android.content.Context
 import android.content.Intent
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.support.v4.app.ActivityOptionsCompat
-import android.support.v4.view.ViewCompat
+import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import android.widget.ProgressBar
 import android.widget.Toast
 import com.gimmatek.hahappy.adapter.ScheduleEventListener
 import com.gimmatek.hahappy.adapter.ScheduleHolder
@@ -27,6 +27,7 @@ class ScheduleActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener, Sc
     private lateinit var refSchedule: DatabaseReference
     private var mSchedules: List<Pair<String, Schedule>>? = null
     private var mMode: String = ""
+    private val uiProgress: ProgressBar by lazy { findViewById<ProgressBar>(R.id.progress_bar) }
 
     private val snapSchedule = object : ValueEventListener {
         override fun onCancelled(error: DatabaseError) {
@@ -40,12 +41,14 @@ class ScheduleActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener, Sc
                     .toList()
 
             uiScheduleList.adapter = mSchedules?.let { ScheduleAdapter(it, this@ScheduleActivity) }
+            uiProgress.visibility = View.GONE
         }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_schedule)
+        uiProgress.visibility = View.VISIBLE
         mAuth.addAuthStateListener(this)
         uiScheduleList.apply {
             setHasFixedSize(true)
@@ -70,6 +73,7 @@ class ScheduleActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener, Sc
             mAuth.removeAuthStateListener(this)
         } else {
             Toast.makeText(this@ScheduleActivity, "暫時無法登入，請重新開啟程式", Toast.LENGTH_SHORT).show()
+            uiProgress.visibility = View.GONE
         }
     }
 
