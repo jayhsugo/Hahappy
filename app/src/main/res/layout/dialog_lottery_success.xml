@@ -7,20 +7,19 @@
 
     <ImageView
         android:id="@+id/iv_background"
-        android:layout_width="300dp"
+        android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginBottom="16dp"
         android:layout_marginTop="16dp"
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
+        android:scaleType="fitXY"
         android:background="@drawable/transaction_success_background"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintDimensionRatio="h,36:50"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintDimensionRatio="h,36:50" />
 
     <ImageView
         android:id="@+id/imageView"
@@ -122,14 +121,15 @@
         android:id="@+id/btn_check"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="0dp"
-        android:layout_marginEnd="0dp"
-        android:layout_marginStart="0dp"
+        android:layout_marginBottom="4dp"
+        android:layout_marginEnd="4dp"
+        android:layout_marginStart="4dp"
+
         android:background="@color/husky_blue"
         android:textColor="@color/colorPrimary"
         android:text="確認"
-        app:layout_constraintBottom_toBottomOf="@+id/iv_background"
-        app:layout_constraintEnd_toEndOf="@+id/iv_background"
-        app:layout_constraintStart_toStartOf="@+id/iv_background" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </android.support.constraint.ConstraintLayout>

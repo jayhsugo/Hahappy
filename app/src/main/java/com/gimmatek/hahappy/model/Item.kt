@@ -11,5 +11,6 @@ import com.google.firebase.database.IgnoreExtraProperties
 data class Item(
         val cardNo: Int = 0,
         val total: Int = 0,
+        var rest: Int = 0,
         val cardName: String = ""
 )

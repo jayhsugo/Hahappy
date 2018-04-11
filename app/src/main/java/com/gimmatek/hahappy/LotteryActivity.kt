@@ -1,15 +1,11 @@
 package com.gimmatek.hahappy
 
-import android.annotation.SuppressLint
-import android.app.Dialog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -23,31 +19,31 @@ import com.google.firebase.database.*
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.HashMap
-import android.content.DialogInterface
-import android.support.v4.app.DialogFragment
-
+import android.util.Log
 
 class LotteryActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
 
     private val uiGiftList: RecyclerView by lazy { findViewById<RecyclerView>(R.id.list_gift) }
     private val uiStart: ImageView by lazy { findViewById<ImageView>(R.id.iv_start) }
+    private val uiRecord: Button by lazy { findViewById<Button>(R.id.btn_record) }
     private val mAuth = FirebaseAuth.getInstance()
     private lateinit var refGift: Query
     private lateinit var refItem: DatabaseReference
     private lateinit var refGetGift: DatabaseReference
     private var mGifts: List<Pair<String, Card>>? = null
     private var mItems: List<Pair<String, Item>>? = null
-    var mItemsMap: HashMap<String, Item> = HashMap()
+    private var mItemsMap: HashMap<String, Item> = HashMap()
     private var mMode: String = ""
-    private var mScheduleId: String? = ""
+    private var mScheduleId: String = ""
     private var mLotteryGiftKey: String = ""
     private var mLotteryGift: Pair<String, Card>? = null
     private var mDbpath: MutableMap<String, String> = mutableMapOf()
     private val uiProgress: ProgressBar by lazy { findViewById<ProgressBar>(R.id.progress_bar) }
+    private val dialog = LotteryDialogFragment()
 
     private val snapItems = object : ValueEventListener {
         override fun onCancelled(error: DatabaseError) {
-
+            toastMsg(error.message)
         }
 
         override fun onDataChange(snap: DataSnapshot) {
@@ -79,7 +75,7 @@ class LotteryActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
 
     private val snapGift = object : ValueEventListener {
         override fun onCancelled(error: DatabaseError) {
-
+            toastMsg(error.message)
         }
 
         override fun onDataChange(snap: DataSnapshot) {
@@ -90,13 +86,15 @@ class LotteryActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
                         .toList()
 
                 uiProgress.visibility = View.GONE
+            } else {
+                toastMsg("獎品準備中")
             }
         }
     }
 
     private val snapGetGift = object : ValueEventListener {
         override fun onCancelled(error: DatabaseError) {
-
+            toastMsg(error.message)
         }
 
         override fun onDataChange(snap: DataSnapshot) {
@@ -108,29 +106,35 @@ class LotteryActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
                 }.format(Date(System.currentTimeMillis()))
 
                 val mTransNo = randomAlphaNumeric(5)
+                val mName: String? = mLotteryGift?.second?.cardName
+                val mItemKey = mLotteryGift?.second?.itemId
+                val mCardNo = mItemsMap[mItemKey]?.cardNo
 
                 val post = mapOf(
-                        "dateTime" to dateTime,
+                        "datetime" to dateTime,
                         "date" to dateTime.substring(0..9),
-                        "cardName" to mLotteryGift?.second?.cardName,
-                        "mScheduleId" to mLotteryGift?.second?.scheduleId,
+                        "cardName" to mName,
+                        "scheduleId" to mScheduleId,
                         "transNo" to mTransNo,
-                        "hasSync" to false
+                        "hasSync" to false,
+                        "cardNo" to mCardNo
                 )
 
                 FirebaseDatabase.getInstance().getReference(mDbpath["LOG"]).child(mLotteryGiftKey).setValue(post).addOnCompleteListener { task1 ->
                     if (task1.isSuccessful) {
-//                        toastMsg("Log 成功")
+//                        toastMsg("GameLog 成功")
                         FirebaseDatabase.getInstance().getReference(mDbpath["CARD"]).child(mLotteryGiftKey).updateChildren(mapOf("isactive" to false)).addOnCompleteListener { task2 ->
                             if (task2.isSuccessful) {
 //                                toastMsg("使獎品失效 成功")
-                                showResult(mTransNo)
+                                if (mName != null) {
+                                    showResult(mName, mCardNo.toString(), mTransNo)
+                                }
                             } else {
 //                                toastMsg("使獎品失效 失敗")
                             }
                         }
                     } else {
-//                        toastMsg("Log 失敗")
+//                        toastMsg("GameLog 失敗")
                     }
                 }
             } else {
@@ -140,46 +144,15 @@ class LotteryActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
         }
     }
 
-    fun showResult(transNo: String) {
-//        val dialog: AlertDialog?
-//        val builder: AlertDialog.Builder = AlertDialog.Builder(this@LotteryActivity, R.style.AhaDialog)
-//        val view = LayoutInflater.from(this@LotteryActivity).inflate(R.layout.dialog_lottery_success, null)
-//
-//        //自定義layout中的元件
-//        val uiName = view.findViewById(R.id.tv_name) as TextView
-//        val uiCardNo = view.findViewById(R.id.tv_cardNo) as TextView
-//        val uiTransNo = view.findViewById(R.id.tv_transNo) as TextView
-//        val uiCheck = view.findViewById(R.id.btn_check) as Button
-//        val key = mLotteryGift?.second?.itemId
-//
-//        uiName.text = mLotteryGift?.second?.cardName
-//        uiCardNo.text = mItemsMap[key]?.cardNo.toString()
-//        uiTransNo.text = transNo
-//
-//        dialog = builder.setView(view).setCancelable(false).create()
+    fun showResult(name: String, cardNo: String, transNo: String) {
 
-//        uiCheck.setOnClickListener {
-//            dialog.cancel()
-//            uiStart.isClickable = true
-//        }
-//
-//        if (!this.isDestroyed) {
-//            try {
-//                dialog.show()
-//            } catch (e: Exception) {
-//                Log.d("MyLog", "dialog.show() NG: $e")
-//            }
-//
-//        }
+        dialog.setValue(name, cardNo, transNo)
 
-        val name = mLotteryGift?.second?.cardName.toString()
-        val key = mLotteryGift?.second?.itemId
-        val cardNo = mItemsMap[key]?.cardNo.toString()
+        if (!isDestroyed) {
+            dialog.show(fragmentManager, "LotteryDialogFragment")
+        }
 
-        val dd: MyDialog = MyDialog(name, cardNo, transNo)
-        dd.show(fragmentManager, "MyDialog")
         uiStart.isClickable = true
-
         uiProgress.visibility = View.GONE
         mLotteryGiftKey = ""
     }
@@ -218,23 +191,35 @@ class LotteryActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
         }
 
         uiStart.setOnClickListener {
-            if (uiProgress.visibility != View.VISIBLE) {
-                uiProgress.visibility = View.VISIBLE
-                uiStart.isClickable = false
-                if (mGifts!!.isNotEmpty()) {
-                    mLotteryGift = mGifts?.shuffled()?.take(1)?.get(0)
-                    mLotteryGiftKey = mLotteryGift?.first ?: ""
-                    Log.d("MyLog", mLotteryGiftKey)
+            if (mGifts != null) {
+                if (uiProgress.visibility != View.VISIBLE) {
+                    uiProgress.visibility = View.VISIBLE
+                    uiStart.isClickable = false
+                    if (mGifts!!.isNotEmpty()) {
+                        mLotteryGift = mGifts?.shuffled()?.take(1)?.get(0)
+                        mLotteryGiftKey = mLotteryGift?.first ?: ""
+                        Log.d("MyLog", mLotteryGiftKey)
 
-                    if (mLotteryGiftKey != "") {
-                        refGetGift = FirebaseDatabase.getInstance().getReference(mDbpath["LOG"]).child(mLotteryGiftKey)
-                        refGetGift.addListenerForSingleValueEvent(snapGetGift)
+                        if (mLotteryGiftKey != "") {
+                            refGetGift = FirebaseDatabase.getInstance().getReference(mDbpath["LOG"]).child(mLotteryGiftKey)
+                            refGetGift.addListenerForSingleValueEvent(snapGetGift)
+                        } else {
+                            toastMsg("暫無資料，請稍後再試！")
+                        }
                     } else {
                         toastMsg("暫無資料，請稍後再試！")
                     }
-                } else {
-                    toastMsg("暫無資料，請稍後再試！")
                 }
+            } else {
+                toastMsg("獎品準備中")
+            }
+        }
+
+        uiRecord.setOnClickListener {
+            if (uiProgress.visibility == View.VISIBLE) {
+                Toast.makeText(this@LotteryActivity, "抽獎中請稍後", Toast.LENGTH_SHORT).show()
+            } else {
+                startActivity(RecordsActivity.createIntent(this, mScheduleId, mMode))
             }
         }
     }
@@ -258,6 +243,14 @@ class LotteryActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
         refItem.removeEventListener(snapItems)
     }
 
+    override fun onBackPressed() {
+        if (uiProgress.visibility == View.VISIBLE) {
+            Toast.makeText(this@LotteryActivity, "抽獎中請稍後", Toast.LENGTH_SHORT).show()
+        } else {
+            super.onBackPressed()
+        }
+    }
+
     fun toastMsg(msg: String) {
         Toast.makeText(this@LotteryActivity, msg, Toast.LENGTH_SHORT).show()
         uiStart.isClickable = true
@@ -277,45 +270,6 @@ class LotteryActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
             uiName.text = item.cardName
             uiTotal.text = item.total.toString()
         }
-    }
-
-    @SuppressLint("ValidFragment")
-    class MyDialog internal constructor(name: String, cardNo: String, transNo: String): DialogFragment() {
-        val x = name
-        val y = cardNo
-        val z = transNo
-
-        override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-
-            return super.onCreateDialog(savedInstanceState)
-
-            val builder = AlertDialog.Builder(activity)
-            // Get the layout inflater
-            val inflater = activity.layoutInflater
-            val view = inflater.inflate(R.layout.dialog_lottery_success, null)
-            // Inflate and set the layout for the dialog
-            // Pass null as the parent view because its going in the dialog layout
-
-            //自定義layout中的元件
-            val uiName = view.findViewById(R.id.tv_name) as TextView
-            val uiCardNo = view.findViewById(R.id.tv_cardNo) as TextView
-            val uiTransNo = view.findViewById(R.id.tv_transNo) as TextView
-            val uiCheck = view.findViewById(R.id.btn_check) as Button
-
-            uiName.text = x
-            uiCardNo.text = y
-            uiTransNo.text = z
-
-            builder.setView(view)
-                    // Add action buttons
-
-            uiCheck.setOnClickListener {
-                builder.show().cancel()
-            }
-
-            return builder.create()
-        }
-
     }
 
     companion object {

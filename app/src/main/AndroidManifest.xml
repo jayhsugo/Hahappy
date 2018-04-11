@@ -25,6 +25,10 @@
         </activity>
         <activity android:name=".ScheduleActivity"
             android:screenOrientation="portrait" />
+        <activity android:name=".RecordsActivity"
+            android:screenOrientation="portrait" />
+        <activity android:name=".RecordsDetailActivity"
+            android:screenOrientation="portrait" />
         <activity android:name=".LotteryActivity"
             android:screenOrientation="portrait" >
         </activity>

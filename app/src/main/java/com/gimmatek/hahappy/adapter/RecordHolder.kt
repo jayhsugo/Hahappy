@@ -6,9 +6,10 @@ import android.view.ViewGroup
 import android.widget.TextView
 import com.gimmatek.hahappy.R
 
-class ItemsHolder (inflater: LayoutInflater, parent: ViewGroup)
-    : RecyclerView.ViewHolder(inflater.inflate(R.layout.card_item_item, parent, false)) {
+class RecordHolder (inflater: LayoutInflater, parent: ViewGroup)
+    : RecyclerView.ViewHolder(inflater.inflate(R.layout.card_record_item, parent, false)) {
     val uiCardNo: TextView = itemView.findViewById(R.id.tv_cardNo)
     val uiName: TextView = itemView.findViewById(R.id.tv_name)
     val uiTotal: TextView = itemView.findViewById(R.id.tv_total)
+    val uiRest: TextView = itemView.findViewById(R.id.tv_rest)
 }

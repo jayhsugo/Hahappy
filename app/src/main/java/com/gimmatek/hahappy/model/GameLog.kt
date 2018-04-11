@@ -8,10 +8,11 @@ import com.google.firebase.database.IgnoreExtraProperties
  */
 @Keep // 保留名稱
 @IgnoreExtraProperties // 忽略讀取到的多於參數
-data class Log(
+data class GameLog(
         val scheduleId: String = "",
         val dateTime: String = "",
         val date: String = "",
         val cardName: String = "",
-        val transNo: String = ""
+        val transNo: String = "",
+        val cardNo: Int = 0
 )

@@ -45,7 +45,7 @@
             tools:text="Hahago 毛巾 乙條" />
 
         <TextView
-            android:id="@+id/tv_transNo"
+            android:id="@+id/tv_total"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
