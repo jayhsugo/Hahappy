@@ -13,9 +13,9 @@
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:textSize="18sp"
         android:text="得獎紀錄"
         android:textColor="@color/colorBankText"
+        android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -27,7 +27,7 @@
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/textView8"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView3"
@@ -55,8 +55,9 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:text="編號"
+        android:textColor="@color/colorBankText"
         app:layout_constraintStart_toStartOf="@+id/list_gift"
-        app:layout_constraintTop_toBottomOf="@+id/tv_title" />
+        app:layout_constraintTop_toBottomOf="@+id/btn_qr" />
 
     <TextView
         android:id="@+id/textView3"
@@ -66,9 +67,10 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:text="品名"
+        android:textColor="@color/colorBankText"
         app:layout_constraintEnd_toStartOf="@+id/textView7"
         app:layout_constraintStart_toEndOf="@+id/textView2"
-        app:layout_constraintTop_toBottomOf="@+id/tv_title" />
+        app:layout_constraintTop_toBottomOf="@+id/btn_qr" />
 
     <TextView
         android:id="@+id/textView4"
@@ -77,8 +79,9 @@
         android:layout_marginEnd="16dp"
         android:layout_marginTop="8dp"
         android:text="剩餘"
+        android:textColor="@color/colorBankText"
         app:layout_constraintEnd_toEndOf="@+id/list_gift"
-        app:layout_constraintTop_toBottomOf="@+id/tv_title" />
+        app:layout_constraintTop_toBottomOf="@+id/btn_qr" />
 
     <TextView
         android:id="@+id/textView7"
@@ -87,7 +90,64 @@
         android:layout_marginEnd="8dp"
         android:layout_marginTop="8dp"
         android:text="總數"
+        android:textColor="@color/colorBankText"
         app:layout_constraintEnd_toStartOf="@+id/textView4"
-        app:layout_constraintTop_toBottomOf="@+id/tv_title" />
+        app:layout_constraintTop_toBottomOf="@+id/btn_qr" />
+
+    <TextView
+        android:id="@+id/textView8"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:layout_marginEnd="8dp"
+        android:text="總數"
+        android:textColor="@color/colorBankText"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/tv_total_count" />
+
+    <TextView
+        android:id="@+id/tv_total_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:layout_marginEnd="32dp"
+        tools:text="100"
+        android:textColor="@color/blue"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/textView10" />
+
+    <TextView
+        android:id="@+id/textView10"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:layout_marginEnd="8dp"
+        android:text="剩餘"
+        android:textColor="@color/colorBankText"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/tv_total_rest" />
+
+    <TextView
+        android:id="@+id/tv_total_rest"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:layout_marginEnd="16dp"
+        tools:text="50"
+        android:textColor="#FF0000"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <Button
+        android:id="@+id/btn_qr"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="8dp"
+        android:background="@color/husky_blue"
+        android:textColor="@color/colorPrimary"
+        android:text="掃描QR"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </android.support.constraint.ConstraintLayout>

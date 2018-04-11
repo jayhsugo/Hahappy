@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Hahappy</string>
+    <string name="alert_ok">確認</string>
 </resources>

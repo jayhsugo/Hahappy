@@ -11,7 +11,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import com.gimmatek.hahappy.adapter.CardHolder
 import com.gimmatek.hahappy.adapter.ItemEventListener
 import com.gimmatek.hahappy.adapter.RecordHolder
 
@@ -24,6 +23,9 @@ import com.google.firebase.database.*
 class RecordsActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener, ItemEventListener {
 
     private val uiGiftList: RecyclerView by lazy { findViewById<RecyclerView>(R.id.list_gift) }
+    private val uiTotalCount: TextView by lazy { findViewById<TextView>(R.id.tv_total_count) }
+    private val uiTotalRest: TextView by lazy { findViewById<TextView>(R.id.tv_total_rest) }
+    private val uiGoToUserList: Button by lazy { findViewById<Button>(R.id.btn_qr) }
     private val mAuth = FirebaseAuth.getInstance()
     private lateinit var refRecord: Query
     private lateinit var refItem: DatabaseReference
@@ -74,14 +76,21 @@ class RecordsActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener, Ite
                     mItems?.get((it.first-1))?.second?.rest = mItems?.get((it.first-1))?.second?.total!! - it.second.size
                 }
 
-                Log.d("MyLog", "mRecords: $mRecords")
-
                 uiGiftList.adapter = mItems?.let { RecordAdapter(mScheduleId, it, this@RecordsActivity) }
                 uiProgress.visibility = View.GONE
             } else {
                 uiGiftList.adapter = mItems?.let { RecordAdapter(mScheduleId, it, this@RecordsActivity) }
                 uiProgress.visibility = View.GONE
             }
+
+            var mTotalCount = 0
+            var mTotalRest = 0
+            mItems?.forEach {
+                mTotalCount += it.second.total
+                mTotalRest += it.second.rest
+            }
+            uiTotalCount.text = mTotalCount.toString()
+            uiTotalRest.text = mTotalRest.toString()
         }
     }
 
@@ -107,6 +116,9 @@ class RecordsActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener, Ite
             setHasFixedSize(true)
             layoutManager = LinearLayoutManager(this@RecordsActivity)
         }
+        uiGoToUserList.setOnClickListener {
+            startActivity(UserFuidListActivity.createIntent(this@RecordsActivity, mMode, mScheduleId))
+        }
     }
 
     override fun onAuthStateChanged(p0: FirebaseAuth) {
@@ -126,6 +138,7 @@ class RecordsActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener, Ite
     override fun onDestroy() {
         super.onDestroy()
         refRecord.removeEventListener(snapRecord)
+        refItem.removeEventListener(snapItems)
     }
 
     override fun onItemSelect(cardNo: Int, scheduleId: String) {

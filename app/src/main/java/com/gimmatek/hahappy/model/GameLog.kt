@@ -14,5 +14,6 @@ data class GameLog(
         val date: String = "",
         val cardName: String = "",
         val transNo: String = "",
-        val cardNo: Int = 0
+        val cardNo: Int = 0,
+        var isgive: Boolean = false
 )

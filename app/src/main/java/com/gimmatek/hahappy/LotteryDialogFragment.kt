@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.widget.TextView
 import android.widget.Button
 import android.support.v7.app.AlertDialog
+import android.util.Log
 import android.view.View
 
 
@@ -55,8 +56,10 @@ class LotteryDialogFragment : DialogFragment() {
     }
 
     override fun show(manager: FragmentManager?, tag: String?) {
-        val ft: FragmentTransaction? = manager?.beginTransaction()
-        ft?.add(this, tag)
-        ft?.commitAllowingStateLoss()
+        if (!isAdded) {
+            val ft: FragmentTransaction? = manager?.beginTransaction()
+            ft?.add(this, tag)
+            ft?.commitAllowingStateLoss()
+        }
     }
 }

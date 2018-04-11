@@ -32,7 +32,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView3"
-        tools:listitem="@layout/card_card_item" />
+        tools:listitem="@layout/card_card_log" />
 
     <ImageView
         android:id="@+id/iv_start"
@@ -41,6 +41,8 @@
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
+        android:visibility="invisible"
+        tools:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -68,6 +70,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:text="編號"
+        android:textColor="@color/colorBankText"
         app:layout_constraintStart_toStartOf="@+id/list_gift"
         app:layout_constraintTop_toBottomOf="@+id/btn_record" />
 
@@ -78,6 +81,7 @@
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:textColor="@color/colorBankText"
         android:text="品名"
         app:layout_constraintEnd_toEndOf="@+id/tv_title"
         app:layout_constraintStart_toStartOf="@+id/tv_title"
@@ -89,6 +93,7 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:layout_marginTop="8dp"
+        android:textColor="@color/colorBankText"
         android:text="數量"
         app:layout_constraintEnd_toEndOf="@+id/list_gift"
         app:layout_constraintTop_toBottomOf="@+id/btn_record" />
@@ -104,4 +109,22 @@
         android:text="得獎紀錄"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_gameover"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="獎品已全數抽完"
+        android:textSize="34sp"
+        android:textColor="#FF0000"
+        android:visibility="invisible"
+        tools:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="@+id/iv_start"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/iv_start" />
 </android.support.constraint.ConstraintLayout>

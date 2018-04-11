@@ -3,6 +3,7 @@
     package="com.gimmatek.hahappy">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.CAMERA" />
 
     <application
         android:allowBackup="true"
@@ -28,6 +29,12 @@
         <activity android:name=".RecordsActivity"
             android:screenOrientation="portrait" />
         <activity android:name=".RecordsDetailActivity"
+            android:screenOrientation="portrait" />
+        <activity android:name=".UserFuidListActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ScanQRCodeActivity"
+            android:parentActivityName=".UserFuidListActivity"
             android:screenOrientation="portrait" />
         <activity android:name=".LotteryActivity"
             android:screenOrientation="portrait" >

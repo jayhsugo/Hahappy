@@ -12,13 +12,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import com.gimmatek.hahappy.adapter.CardHolder
+import com.gimmatek.hahappy.adapter.CardLogEventListener
 import com.gimmatek.hahappy.adapter.RecordHolder
 import com.gimmatek.hahappy.model.GameLog
 import com.gimmatek.hahappy.utils.ReferenceManager
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 
-class RecordsDetailActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
+class RecordsDetailActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener, CardLogEventListener {
 
     private val uiGiftList: RecyclerView by lazy { findViewById<RecyclerView>(R.id.list_gift) }
     private val mAuth = FirebaseAuth.getInstance()
@@ -40,7 +41,7 @@ class RecordsDetailActivity : AppCompatActivity(), FirebaseAuth.AuthStateListene
                 mRecords = snap.children.asSequence()
                         .mapNotNull { child -> child.getValue(GameLog::class.java)?.let { child.key to it } }
                         .filter { it.second.cardNo == mCardNo }
-                        .sortedBy { it.second.cardNo }
+                        .sortedBy { it.second.transNo }
                         .toList()
 
                 Log.d("MyLog", "mRecords: $mRecords")
@@ -49,7 +50,7 @@ class RecordsDetailActivity : AppCompatActivity(), FirebaseAuth.AuthStateListene
                     uiProgress.visibility = View.GONE
                     Toast.makeText(this@RecordsDetailActivity, "目前暫無紀錄！", Toast.LENGTH_SHORT).show()
                 } else {
-                    uiGiftList.adapter = mRecords?.let { RecordAdapter(it) }
+                    uiGiftList.adapter = mRecords?.let { RecordAdapter(it, this@RecordsDetailActivity) }
                     uiProgress.visibility = View.GONE
                 }
             } else {
@@ -99,20 +100,39 @@ class RecordsDetailActivity : AppCompatActivity(), FirebaseAuth.AuthStateListene
         refRecord.removeEventListener(snapRecord)
     }
 
+    override fun onCardLogClick(isgive: Boolean, cardId: String) {
+
+        Log.d("MyLog", "isgive: $isgive cardId: $cardId")
+
+        FirebaseDatabase.getInstance().getReference(mDbpath["LOG"]).child(cardId).updateChildren(mapOf("isgive" to !isgive)).addOnCompleteListener {
+            if (it.isSuccessful) {
+                Toast.makeText(this@RecordsDetailActivity, "紀錄成功", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(this@RecordsDetailActivity, "紀錄失敗，請重試", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
 
 
-    private class RecordAdapter internal constructor(val items: List<Pair<String, GameLog>>) : RecyclerView.Adapter<CardHolder>() {
+
+    private class RecordAdapter internal constructor(val items: List<Pair<String, GameLog>>, private val eventListener: CardLogEventListener) : RecyclerView.Adapter<CardHolder>() {
+        private val mCardLogColor: List<Int> = listOf(R.color.colorCoin, R.color.colorGrey)
+
         override fun getItemCount(): Int = items.size
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CardHolder = CardHolder(LayoutInflater.from(parent.context), parent)
 
         override fun onBindViewHolder(holder: CardHolder, position: Int) = with(holder) {
             val item = items[position].second
-//            val key = items[position].first
+            val cardId = items[position].first
 
             uiCardNo.text = item.cardNo.toString()
             uiName.text = item.cardName
             uiTransNo.text = item.transNo
+
+            itemView.setBackgroundResource(mCardLogColor[if (item.isgive) 1 else 0])
+
+            itemView.setOnClickListener { eventListener.onCardLogClick(item.isgive, cardId) }
         }
     }
 

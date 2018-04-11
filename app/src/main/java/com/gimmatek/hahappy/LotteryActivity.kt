@@ -20,14 +20,17 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.HashMap
 import android.util.Log
+import com.gimmatek.hahappy.model.GameLog
 
 class LotteryActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
 
     private val uiGiftList: RecyclerView by lazy { findViewById<RecyclerView>(R.id.list_gift) }
     private val uiStart: ImageView by lazy { findViewById<ImageView>(R.id.iv_start) }
     private val uiRecord: Button by lazy { findViewById<Button>(R.id.btn_record) }
+    private val uiGameover: TextView by lazy { findViewById<TextView>(R.id.tv_gameover) }
     private val mAuth = FirebaseAuth.getInstance()
     private lateinit var refGift: Query
+    private lateinit var refCardLogCount: Query
     private lateinit var refItem: DatabaseReference
     private lateinit var refGetGift: DatabaseReference
     private var mGifts: List<Pair<String, Card>>? = null
@@ -85,6 +88,14 @@ class LotteryActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
                         .mapNotNull { child -> child.getValue(Card::class.java)?.let { child.key to it } }
                         .toList()
 
+                if (mGifts!!.isEmpty()) {
+                    uiGameover.visibility = View.VISIBLE
+                    uiStart.visibility = View.INVISIBLE
+                } else {
+                    uiGameover.visibility = View.INVISIBLE
+                    uiStart.visibility = View.VISIBLE
+                }
+
                 uiProgress.visibility = View.GONE
             } else {
                 toastMsg("獎品準備中")
@@ -99,44 +110,8 @@ class LotteryActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
 
         override fun onDataChange(snap: DataSnapshot) {
             if (!snap.exists()) {
-                // 將card寫入log
-
-                val dateTime = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.TAIWAN).apply {
-                    timeZone = TimeZone.getTimeZone("Asia/Taipei")
-                }.format(Date(System.currentTimeMillis()))
-
-                val mTransNo = randomAlphaNumeric(5)
-                val mName: String? = mLotteryGift?.second?.cardName
-                val mItemKey = mLotteryGift?.second?.itemId
-                val mCardNo = mItemsMap[mItemKey]?.cardNo
-
-                val post = mapOf(
-                        "datetime" to dateTime,
-                        "date" to dateTime.substring(0..9),
-                        "cardName" to mName,
-                        "scheduleId" to mScheduleId,
-                        "transNo" to mTransNo,
-                        "hasSync" to false,
-                        "cardNo" to mCardNo
-                )
-
-                FirebaseDatabase.getInstance().getReference(mDbpath["LOG"]).child(mLotteryGiftKey).setValue(post).addOnCompleteListener { task1 ->
-                    if (task1.isSuccessful) {
-//                        toastMsg("GameLog 成功")
-                        FirebaseDatabase.getInstance().getReference(mDbpath["CARD"]).child(mLotteryGiftKey).updateChildren(mapOf("isactive" to false)).addOnCompleteListener { task2 ->
-                            if (task2.isSuccessful) {
-//                                toastMsg("使獎品失效 成功")
-                                if (mName != null) {
-                                    showResult(mName, mCardNo.toString(), mTransNo)
-                                }
-                            } else {
-//                                toastMsg("使獎品失效 失敗")
-                            }
-                        }
-                    } else {
-//                        toastMsg("GameLog 失敗")
-                    }
-                }
+                refCardLogCount = FirebaseDatabase.getInstance().getReference(mDbpath["LOG"]).orderByChild("scheduleId").equalTo(mScheduleId)
+                refCardLogCount.addListenerForSingleValueEvent(snapCardLog)
             } else {
                 // 顯示此獎品已抽過，請重新抽
                 toastMsg("此獎品已抽過，請重抽")
@@ -144,7 +119,69 @@ class LotteryActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
         }
     }
 
-    fun showResult(name: String, cardNo: String, transNo: String) {
+    private val snapCardLog = object : ValueEventListener {
+        override fun onCancelled(error: DatabaseError) {
+            toastMsg(error.message)
+        }
+
+        override fun onDataChange(snap: DataSnapshot) {
+            val mItemKey = mLotteryGift?.second?.itemId
+            val mCardNo = mItemsMap[mItemKey]?.cardNo
+
+            if (snap.exists()) {
+                val cardLogCount = snap.children.asSequence()
+                        .mapNotNull { child -> child.getValue(GameLog::class.java)?.let { child.key to it } }
+                        .filter { it.second.cardNo == mCardNo }
+                        .count()
+
+                writeGameLog(cardLogCount, mCardNo!!)
+            } else {
+                writeGameLog(0, mCardNo!!)
+            }
+        }
+    }
+
+    fun writeGameLog(cardLogCount: Int, cardNo: Int) {
+        val dateTime = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.TAIWAN).apply {
+            timeZone = TimeZone.getTimeZone("Asia/Taipei")
+        }.format(Date(System.currentTimeMillis()))
+
+        val mName: String? = mLotteryGift?.second?.cardName
+        val mCount = if (cardLogCount + 1 < 10) {
+            "0${cardLogCount + 1}"
+        } else {
+            "${cardLogCount + 1}"
+        }
+        val mTransNo = "$cardNo$mCount"
+        val post = mapOf(
+                "datetime" to dateTime,
+                "date" to dateTime.substring(0..9),
+                "cardName" to mName,
+                "scheduleId" to mScheduleId,
+                "transNo" to mTransNo,
+                "hasSync" to false,
+                "cardNo" to cardNo,
+                "isgive" to false
+        )
+
+        FirebaseDatabase.getInstance().getReference(mDbpath["LOG"]).child(mLotteryGiftKey).setValue(post).addOnCompleteListener { task1 ->
+            if (task1.isSuccessful) {
+                FirebaseDatabase.getInstance().getReference(mDbpath["CARD"]).child(mLotteryGiftKey).updateChildren(mapOf("isactive" to false)).addOnCompleteListener { task2 ->
+                    if (task2.isSuccessful) {
+                        if (mName != null) {
+                            showResult(mName, cardNo.toString(), mTransNo)
+                        }
+                    } else {
+                                toastMsg("使獎品失效 失敗")
+                    }
+                }
+            } else {
+                        toastMsg("GameLog 失敗")
+            }
+        }
+    }
+
+    private fun showResult(name: String, cardNo: String, transNo: String) {
 
         dialog.setValue(name, cardNo, transNo)
 
@@ -157,14 +194,14 @@ class LotteryActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
         mLotteryGiftKey = ""
     }
 
-    fun randomAlphaNumeric(length: Int): String = StringBuilder().run {
-        val chars = SOURCE_ORDER_NO.toCharArray()
-        val random = Random()
-        for (i in 0 until length) {
-            append(chars[random.nextInt(chars.size)])
-        }
-        toString()
-    }
+//    fun randomAlphaNumeric(length: Int): String = StringBuilder().run {
+//        val chars = SOURCE_ORDER_NO.toCharArray()
+//        val random = Random()
+//        for (i in 0 until length) {
+//            append(chars[random.nextInt(chars.size)])
+//        }
+//        toString()
+//    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -191,27 +228,31 @@ class LotteryActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
         }
 
         uiStart.setOnClickListener {
-            if (mGifts != null) {
-                if (uiProgress.visibility != View.VISIBLE) {
-                    uiProgress.visibility = View.VISIBLE
-                    uiStart.isClickable = false
-                    if (mGifts!!.isNotEmpty()) {
-                        mLotteryGift = mGifts?.shuffled()?.take(1)?.get(0)
-                        mLotteryGiftKey = mLotteryGift?.first ?: ""
-                        Log.d("MyLog", mLotteryGiftKey)
-
-                        if (mLotteryGiftKey != "") {
-                            refGetGift = FirebaseDatabase.getInstance().getReference(mDbpath["LOG"]).child(mLotteryGiftKey)
-                            refGetGift.addListenerForSingleValueEvent(snapGetGift)
-                        } else {
-                            toastMsg("暫無資料，請稍後再試！")
-                        }
-                    } else {
-                        toastMsg("暫無資料，請稍後再試！")
-                    }
-                }
+            if (dialog.isAdded) {
+                Toast.makeText(this@LotteryActivity, "請稍後", Toast.LENGTH_SHORT).show()
             } else {
-                toastMsg("獎品準備中")
+                if (mGifts != null) {
+                    if (uiProgress.visibility != View.VISIBLE) {
+                        uiProgress.visibility = View.VISIBLE
+                        uiStart.isClickable = false
+                        if (mGifts!!.isNotEmpty()) {
+                            mLotteryGift = mGifts?.shuffled()?.take(1)?.get(0)
+                            mLotteryGiftKey = mLotteryGift?.first ?: ""
+                            Log.d("MyLog", mLotteryGiftKey)
+
+                            if (mLotteryGiftKey != "") {
+                                refGetGift = FirebaseDatabase.getInstance().getReference(mDbpath["LOG"]).child(mLotteryGiftKey)
+                                refGetGift.addListenerForSingleValueEvent(snapGetGift)
+                            } else {
+                                toastMsg("暫無資料，請稍後再試！")
+                            }
+                        } else {
+                            toastMsg("獎品已抽完")
+                        }
+                    }
+                } else {
+                    toastMsg("獎品準備中")
+                }
             }
         }
 
@@ -241,6 +282,7 @@ class LotteryActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
     override fun onDestroy() {
         super.onDestroy()
         refItem.removeEventListener(snapItems)
+        refGift.removeEventListener(snapGift)
     }
 
     override fun onBackPressed() {
@@ -253,8 +295,8 @@ class LotteryActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
 
     fun toastMsg(msg: String) {
         Toast.makeText(this@LotteryActivity, msg, Toast.LENGTH_SHORT).show()
-        uiStart.isClickable = true
         uiProgress.visibility = View.GONE
+        uiStart.isClickable = true
     }
 
     private class ItemsAdapter internal constructor(val items: List<Pair<String, Item>>) : RecyclerView.Adapter<ItemsHolder>() {
@@ -276,7 +318,7 @@ class LotteryActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
         private const val TAG = "LotteryActivity"
         private const val EXTRA_SCHEDULE_ID = "EXTRA_SCHEDULE_ID"
         private const val EXTRA_DB_MODE = "EXTRA_DB_MODE"
-        private const val SOURCE_ORDER_NO = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+//        private const val SOURCE_ORDER_NO = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
         fun createIntent(packageContext: Context, scheduleId: String, dbMode: String): Intent
                 = Intent(packageContext, LotteryActivity::class.java).also {
