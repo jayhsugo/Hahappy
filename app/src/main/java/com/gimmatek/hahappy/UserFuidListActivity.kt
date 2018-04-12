@@ -30,7 +30,7 @@ class UserFuidListActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener
     private val uiStartQR: Button by lazy { findViewById<Button>(R.id.btn_qr) }
     private val mAuth = FirebaseAuth.getInstance()
     private lateinit var refUser: DatabaseReference
-    private var mUserList: MutableList<String> = mutableListOf()
+    private var mUserList: List<String> = listOf()
     private var mSchedulesId: String = ""
     private var mMode: String = ""
     private var mDbpath: MutableMap<String, String> = mutableMapOf()
@@ -42,11 +42,10 @@ class UserFuidListActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener
         }
 
         override fun onDataChange(snap: DataSnapshot) {
+            mUserList = snap.children.mapNotNull { it.key }.toList()
 
-            if (snap.exists()) {
-                snap.children.forEach {
-                    mUserList.add(it.key)
-                }
+            if (mUserList.isEmpty()) {
+                Toast.makeText(this@UserFuidListActivity, "暫無資料", Toast.LENGTH_SHORT).show()
             }
 
             uiUserFuidList.adapter = mUserList.let { UserAdapter(it) }

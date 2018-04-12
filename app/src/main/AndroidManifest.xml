@@ -24,19 +24,29 @@
             </intent-filter>
 
         </activity>
-        <activity android:name=".ScheduleActivity"
+        <activity
+            android:name=".ScheduleActivity"
+            android:label="@string/app_schedule"
             android:screenOrientation="portrait" />
-        <activity android:name=".RecordsActivity"
+        <activity
+            android:name=".RecordsActivity"
+            android:label="@string/app_Records"
             android:screenOrientation="portrait" />
-        <activity android:name=".RecordsDetailActivity"
+        <activity
+            android:name=".RecordsDetailActivity"
+            android:label="@string/app_RecordsDetail"
             android:screenOrientation="portrait" />
-        <activity android:name=".UserFuidListActivity"
+        <activity
+            android:name=".UserFuidListActivity"
+            android:label="@string/app_UserFuidList"
             android:screenOrientation="portrait" />
         <activity
             android:name=".ScanQRCodeActivity"
-            android:parentActivityName=".UserFuidListActivity"
+            android:label="@string/app_QR"
             android:screenOrientation="portrait" />
-        <activity android:name=".LotteryActivity"
+        <activity
+            android:name=".LotteryActivity"
+            android:label="@string/app_Lottery"
             android:screenOrientation="portrait" >
         </activity>
     </application>

@@ -1,4 +1,10 @@
 <resources>
     <string name="app_name">Hahappy</string>
+    <string name="app_schedule">Hahappy-場次</string>
+    <string name="app_Lottery">Hahappy-抽獎</string>
+    <string name="app_Records">Hahappy-紀錄</string>
+    <string name="app_RecordsDetail">Hahappy-紀錄明細</string>
+    <string name="app_UserFuidList">Hahappy-哈幣登記清單</string>
+    <string name="app_QR">Hahappy-掃描QR CODE</string>
     <string name="alert_ok">確認</string>
 </resources>

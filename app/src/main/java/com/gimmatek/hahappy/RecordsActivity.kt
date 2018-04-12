@@ -83,14 +83,11 @@ class RecordsActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener, Ite
                 uiProgress.visibility = View.GONE
             }
 
-            var mTotalCount = 0
-            var mTotalRest = 0
-            mItems?.forEach {
-                mTotalCount += it.second.total
-                mTotalRest += it.second.rest
+            mItems?.let {
+                uiTotalCount.text = it.map { it.second.total }.reduce { acc, i -> acc + i }.toString()
+                uiTotalRest.text = it.map { it.second.rest }.reduce { acc, i -> acc + i  }.toString()
             }
-            uiTotalCount.text = mTotalCount.toString()
-            uiTotalRest.text = mTotalRest.toString()
+
         }
     }
 
