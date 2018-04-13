@@ -12,5 +12,6 @@ data class Card(
         val scheduleId: String = "",
         val isactive: Boolean = false,
         val cardName: String = "",
-        val itemId: String = ""
+        val itemId: String = "",
+        var cardNo: Int = 0
 )

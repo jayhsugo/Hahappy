@@ -45,12 +45,9 @@ class RecordsActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener, Ite
         override fun onDataChange(snap: DataSnapshot) {
             if (snap.exists()) {
                 mItems = snap.children.asSequence()
-                        .mapNotNull { child -> child.getValue(Item::class.java)?.let { child.child("cardNo").getValue(Int::class.java) to it }}
+                        .mapNotNull { child -> child.getValue(Item::class.java)?.let { child.child("cardNo").getValue(Int::class.java) to it }
+                        .also { it?.let {it.second.rest = it.second.total }} }
                         .toList()
-
-                mItems?.forEach {
-                    it.second.rest = it.second.total
-                }
 
                 Log.d("MyLog", "mItems: $mItems")
 
@@ -72,8 +69,14 @@ class RecordsActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener, Ite
                         .groupBy { it.cardNo }
                         .toList()
 
-                mRecords?.forEach {
-                    mItems?.get((it.first-1))?.second?.rest = mItems?.get((it.first-1))?.second?.total!! - it.second.size
+                mRecords?.let {
+                    it.forEach { record ->
+                        mItems?.let { item ->
+                            with(record.first - 1) {
+                                item[this].second.rest = item[this].second.total - record.second.size
+                            }
+                        }
+                    }
                 }
 
                 uiGiftList.adapter = mItems?.let { RecordAdapter(mScheduleId, it, this@RecordsActivity) }
@@ -87,7 +90,6 @@ class RecordsActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener, Ite
                 uiTotalCount.text = it.map { it.second.total }.reduce { acc, i -> acc + i }.toString()
                 uiTotalRest.text = it.map { it.second.rest }.reduce { acc, i -> acc + i  }.toString()
             }
-
         }
     }
 

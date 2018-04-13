@@ -17,6 +17,7 @@ class LoginActivity : AppCompatActivity(), RadioGroup.OnCheckedChangeListener {
     private val uiEmail: EditText by lazy { findViewById<EditText>(R.id.et_email) }
     private val uiPassword: EditText by lazy { findViewById<EditText>(R.id.et_password) }
     private val uiLogin: Button by lazy { findViewById<Button>(R.id.btn_login) }
+    private val uiVersion: TextView by lazy { findViewById<TextView>(R.id.tv_version) }
     private lateinit var uiRbBtn: Array<RadioButton>
     private val uiDbSelect: RadioGroup by lazy { findViewById<RadioGroup>(R.id.rg_db_select) }
     private var mEmail: String = ""
@@ -31,6 +32,8 @@ class LoginActivity : AppCompatActivity(), RadioGroup.OnCheckedChangeListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
+
+        uiVersion.text = String.format("%s", BuildConfig.VERSION_NAME)
 
         uiRbBtn = arrayOf(findViewById(R.id.rb_debug), findViewById(R.id.rb_release))
         uiDbSelect.setOnCheckedChangeListener(this)
