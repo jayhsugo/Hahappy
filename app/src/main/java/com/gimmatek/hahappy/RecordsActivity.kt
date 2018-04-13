@@ -46,7 +46,7 @@ class RecordsActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener, Ite
             if (snap.exists()) {
                 mItems = snap.children.asSequence()
                         .mapNotNull { child -> child.getValue(Item::class.java)?.let { child.child("cardNo").getValue(Int::class.java) to it }
-                        .also { it?.let {it.second.rest = it.second.total }} }
+                        .also { it?.run { second.rest = second.total } } }
                         .toList()
 
                 Log.d("MyLog", "mItems: $mItems")
@@ -69,11 +69,11 @@ class RecordsActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener, Ite
                         .groupBy { it.cardNo }
                         .toList()
 
-                mRecords?.let {
-                    it.forEach { record ->
+                mRecords?.run {
+                    forEach { record ->
                         mItems?.let { item ->
-                            with(record.first - 1) {
-                                item[this].second.rest = item[this].second.total - record.second.size
+                            (record.first - 1).let { index ->
+                                item[index].second.rest = item[index].second.total - record.second.size
                             }
                         }
                     }

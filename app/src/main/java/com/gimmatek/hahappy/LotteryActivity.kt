@@ -35,7 +35,7 @@ class LotteryActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
     private lateinit var refGetGift: DatabaseReference
     private var mGifts: List<Pair<String, Card>> = listOf()
     private var mItems: List<Pair<String, Item>> = listOf()
-    private var mItemsMap: MutableMap<String, Item> = mutableMapOf()
+    private var mItemsMap: Map<String, Item> = mapOf()
     private var mMode: String = ""
     private var mScheduleId: String = ""
     private var mLotteryGiftKey: String = ""
@@ -51,11 +51,13 @@ class LotteryActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
 
         override fun onDataChange(snap: DataSnapshot) {
             if (snap.exists()) {
-                mItems = snap.children.asSequence()
-                        .mapNotNull { child -> child.getValue(Item::class.java)?.let { child.key to it } }
-                        .toList()
 
-                mItemsMap = mItems.map { it.first to it.second }.toMap().toMutableMap()
+                mItemsMap = snap.children.asSequence()
+                        .mapNotNull { child ->
+                            child.getValue(Item::class.java)?.let { child.key to it }
+                        }.toMap()
+
+                mItems = mItemsMap.toList()
 
                 Log.d("MyLog", "mItems: $mItems")
                 Log.d("MyLog", "mItemsMap: $mItemsMap")
@@ -77,13 +79,14 @@ class LotteryActivity : AppCompatActivity(), FirebaseAuth.AuthStateListener {
             if (snap.exists()) {
                 mGifts = snap.children.asSequence()
                         .filter { it.child("isactive").getValue(Boolean::class.java) == true }
-                        .mapNotNull { child -> child.getValue(Card::class.java)?.let { child.key to it }
-                                .also { gift -> gift?.let { mItemsMap.let { gift.second.cardNo = it[gift.second.itemId]?.cardNo ?: 0 }}}}
+                        .mapNotNull { child ->
+                            child.getValue(Card::class.java)?.let { card ->
+                                mItemsMap.let { itemMap ->
+                                    card.cardNo = itemMap[card.itemId]?.cardNo ?: 0
+                                }.let { child.key to card }
+                            }
+                        }
                         .toList()
-
-//                mGifts.forEach {
-//                    it.second.cardNo = mItemsMap[it.second.itemId]?.cardNo ?: 0
-//                }
 
                 if (mGifts.isEmpty()) {
                     uiGameover.visibility = View.VISIBLE
